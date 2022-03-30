@@ -3,7 +3,8 @@
 binhex386 Platform repository
 
 # CHANGELOG
-## Homework #1
+
+## 2022-03-30 Homework-1
 
 1. Why the pods were restarted after `docker rm -f` and `kubectl delete pod`? What is different about how the pods `core-dns` and `kube-apiserver` are restarted?
    - The pod `core-dns` was restored because it was previously deployed as a *Deployment* resource. So, the *scheduler* tracks that there are enough replicas of the corresponding service is *Running*.
@@ -17,7 +18,7 @@ binhex386 Platform repository
    - Pod was restarted and its status was verified again.
    - The service was manually checked with `port-forward`.
 5. The manifest of the `frontend` service of `microservices-demo` was created:
-  - The image `binhex386/frontend-demo` was built and pushed to docker.io.
-  - The manifest was bootstrapped with `run --dry-run=client`.
-  - All required environment variables were added to the manifest so that the service could start.
-  - The resulting manifest was saved as `frontend-pod-healthy.yaml`.
+   - The image `binhex386/frontend-demo` was built and pushed to docker.io.
+   - The manifest was bootstrapped with `run --dry-run=client`.
+   - All required environment variables were added to the manifest so that the service could start.
+   - The resulting manifest was saved as `frontend-pod-healthy.yaml`.
