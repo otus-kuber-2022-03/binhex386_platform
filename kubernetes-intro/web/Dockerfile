@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-WORKDIR /app
+VOLUME /app
 
 COPY homework.html .
 
@@ -14,4 +14,3 @@ RUN set -xeu; \
     chown app /var/cache/app
 
 EXPOSE 8000
-

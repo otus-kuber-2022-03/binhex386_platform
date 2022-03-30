@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+  labels:
+    homework: kubernetes-intro
+spec:
+  containers:
+    - name: web
+      image: binhex386/kubernetes-intro
+      volumeMounts:
+        - mountPath: /app
+          name: www
+  initContainers:
+    - name: init-www
+      image: busybox
+      command: ['sh', '-c', "wget -O- https://tinyurl.com/otus-k8s-intro | sh"]
+      volumeMounts:
+        - mountPath: /app
+          name: www
+  volumes:
+    - name: www
+      emptyDir: {}
