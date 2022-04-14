@@ -17,10 +17,9 @@ kind: ClusterRoleBinding
 metadata:
   name: pod-managers
 subjects:
-  - kind: ServiceAccount
-    name: carol
-    namespace: prometheus
-    apiGroup: ""
+  - kind: Group
+    name: system:serviceaccounts:prometheus
+    apiGroup: rbac.authorization.k8s.io
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
