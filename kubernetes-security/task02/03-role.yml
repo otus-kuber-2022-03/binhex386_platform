@@ -19,10 +19,10 @@ metadata:
   name: pod-managers
   namespace: prometheus
 subjects:
-  - kind: User
+  - kind: ServiceAccount
     name: carol
     namespace: prometheus
-    apiGroup: rbac.authorization.k8s.io
+    apiGroup: ""
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

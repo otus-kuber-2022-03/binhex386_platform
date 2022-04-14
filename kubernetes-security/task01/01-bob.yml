@@ -9,10 +9,10 @@ kind: ClusterRoleBinding
 metadata:
   name: bob-admin
 subjects:
-  - kind: User
+  - kind: ServiceAccount
     name: bob
     namespace: default
-    apiGroup: rbac.authorization.k8s.io
+    apiGroup: ""
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
