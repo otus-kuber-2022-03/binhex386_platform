@@ -1,8 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: manage-pods
-  namespace: prometheus
 rules:
 - apiGroups:
   - '*'
@@ -14,10 +13,9 @@ rules:
   - 'watch'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: pod-managers
-  namespace: prometheus
 subjects:
   - kind: ServiceAccount
     name: carol
@@ -25,5 +23,5 @@ subjects:
     apiGroup: ""
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: ClusterRole
   name: manage-pods
