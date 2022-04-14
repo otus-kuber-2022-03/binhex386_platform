@@ -4,6 +4,10 @@ binhex386 Platform repository
 
 # CHANGELOG
 
+## 2022-04-14 Homework-3
+
+1. All the manifests required by the homework description were created and tested locally.
+
 ## 2022-04-05 Homework-2
 
 1. Kind cluster with 3 master nodes and 3 worker nodes was deployed locally.
@@ -21,7 +25,7 @@ binhex386 Platform repository
 13. Readiness probe was addede to a Frontend deployment manifest. It was verified that update stops on first pod if probe URL path is invalid.
 14. Status of the deployment was checked with `kubectl rollout status` command.
 15. ⭐ Node exported daemon set manifest was applied. It was verified that with port forwarding metrics are available via localhost.
-16. ⭐⭐ Well, in fact, the first manifest I've found was already able to run exported on master nodes. However, I guess that the key to the task is the `nodeSelector` parameter.
+16. ⭐⭐ Well, in fact, the first manifest I've found was already able to run exporter on master nodes. However, I guess that the key to the task is the `nodeSelector` parameter.
 
 ## 2022-03-30 Homework-1
 
