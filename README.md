@@ -4,6 +4,47 @@ binhex386 Platform repository
 
 # CHANGELOG
 
+## 2022-04-20 Homework-4
+
+1. Add `readinessProbe` to the web pod.
+2. Start the web pod and verify it is running but not ready.
+3. Noticed the Conditions section of the pod description.
+4. Fixed the pod port in `readinessProbe`.
+5. Self-assessment question:
+   - The configuration with `ps | grep` is not valid at least because `ps | grep` will always find the `grep` process and a return code will always be `0`.
+   - Even with `grep -v grep` this check is very poor, as a process may exist but still not function properly.
+   - Similar check may make sense when a service is a queue consumer rather that a network service.
+6. Created a manifest for a deployment and applied it to the cluster.
+7. Scaled the deployment to 3 replicas.
+8. Added `strategy` property to the deployment manifest.
+9. Actually skipped playing with `maxUnavailable` and `maxSurge`, but I get the idea :)
+10. Copied and applied `web-svc-cip.yaml`. Verified that the service appeared in the cluster.
+11. curl'ed the service via cluster IP (OK), ping'ed clusted IP (nope), verified that `arp -an` and `ip a` know nothing about cluster IP, but `iptables` use it for DNAT.
+12. Modified `kube-proxy` configmap via `kubectl edit` (here, I am requesting extra points for quitting `vi` without googling). Restarted `kube-proxy` by deleting the pod.
+13. Done some weird stuff to clean up `iptables` rules... Interesting if something like restaring a node would do the same without a risk to mess up with the rules.
+14. Installed `ipvsadm` via `toolbox` into the minikube VM.
+15. Verified (via `ipvsadm`) that the service is configured properly.
+16. Verified that ping of cluster IP now works, and that cluster IP is now configured on a virtual interface.
+17. Deployed MetalLB.
+18. Downloaded and applied `metallb-config.yaml`.
+19. Created and applied `web-svc-lb.yaml`.
+20. Found LB ingress (172.17.255.1). Found minikube IP (192.168.59.100).
+21. Added static route to LB via minikube. Verified it works: `curl -v http://172.17.255.1:80/index.html`.
+22. ⭐ Created `coredns` load balancers for accessing internal DNS via external IP.
+23. Deployed nginx ingress and applied load balancer manifest. Found ingress IP address (172.17.255.4). Verified that the ingress works via ping and curl.
+24. Created and applied headless service manifest. Verified that cluster IP was not assigned.
+25. Created and applied ingress resource manifest.
+26. Fixed manifest: `ingressClassName`, `pathType`, `service.name`, `service.port.number`.
+27. ⭐ Made dashboard available via ingress:
+   - Installed dashboard via [this manifest](https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.1/aio/deploy/recommended.yaml).
+   - Created and applied ingress resource manifest.
+27. ⭐ Made canary for ingress:
+    - Created and applied deployment manifest that replies "I am Canary".
+    - Created and applied service for those deployment.
+    - Created and applied canary ingress for those service.
+    - Verified that response now depends on "x-canary" header.
+
+
 ## 2022-04-14 Homework-3
 
 1. All the manifests required by the homework description were created and tested locally.

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-canary
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-canary
+  template:
+    metadata:
+      name: web-canary
+      labels:
+        app: web-canary
+    spec:
+      containers:
+        - name: web-canary
+          image: binhex386/kubernetes-intro
+          volumeMounts:
+            - mountPath: /app
+              name: www
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64M
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: 8000
+      initContainers:
+        - name: init-www
+          image: busybox
+          command: ['sh', '-c', "echo I am Canary > /app/index.html"]
+          volumeMounts:
+            - mountPath: /app
+              name: www
+      volumes:
+        - name: www
+          emptyDir: {}
+
