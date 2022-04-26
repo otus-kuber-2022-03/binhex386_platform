@@ -4,7 +4,7 @@ binhex386 Platform repository
 
 # CHANGELOG
 
-## 2022-04-20 Homework-4
+## 2022-04-26 Homework-4
 
 1. Add `readinessProbe` to the web pod.
 2. Start the web pod and verify it is running but not ready.
