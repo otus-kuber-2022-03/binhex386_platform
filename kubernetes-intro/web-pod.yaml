@@ -11,6 +11,14 @@ spec:
       volumeMounts:
         - mountPath: /app
           name: www
+      resources:
+        limits:
+          cpu: 100m
+          memory: 64M
+      readinessProbe:
+        httpGet:
+          path: /index.html
+          port: 8000
   initContainers:
     - name: init-www
       image: busybox
