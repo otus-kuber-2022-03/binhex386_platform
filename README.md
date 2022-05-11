@@ -4,7 +4,18 @@ binhex386 Platform repository
 
 # CHANGELOG
 
-## 2022-04-26 Homework-4
+## 2022-05-10 Homework 5: Volumes
+
+1. Created a new `kind` cluster.
+2. Applied the [minio-statefulset](kubectl apply -f https://raw.githubusercontent.com/express42/otus-platform-snippets/master/Module-02/Kuberenetes-volumes/minio-statefulset.yaml) manifest (statefulset.apps/minio created). Verified that all the resources were created as expected.
+3. Applied the [minio-headless-service](https://raw.githubusercontent.com/express42/otus-platform-snippets/master/Module-02/Kuberenetes-volumes/minio-headless-service.yaml) manifest (service/minio created). Verified that a service were created.
+4. ⭐ Moved minio credentials to secrets:
+   - Created `minioSecrets` with credentials from the original `minio-statefulset` manifest.
+   - Copied the original `minio-statefulset` manifest and modified it for the use of the secret.
+   - Applied both manifests in that order.
+5. Deleted the `kind` cluster.
+
+## 2022-04-26 Homework 4: Networks
 
 1. Add `readinessProbe` to the web pod.
 2. Start the web pod and verify it is running but not ready.
@@ -44,12 +55,11 @@ binhex386 Platform repository
     - Created and applied canary ingress for those service.
     - Verified that response now depends on "x-canary" header.
 
+## 2022-04-14 Homework 3: Security
 
-## 2022-04-14 Homework-3
+All the manifests required by the homework description were created and tested locally.
 
-1. All the manifests required by the homework description were created and tested locally.
-
-## 2022-04-05 Homework-2
+## 2022-04-05 Homework 2: Intro
 
 1. Kind cluster with 3 master nodes and 3 worker nodes was deployed locally.
 2. Frontend microservice was deployed via ReplicaSet.
@@ -68,7 +78,7 @@ binhex386 Platform repository
 15. ⭐ Node exported daemon set manifest was applied. It was verified that with port forwarding metrics are available via localhost.
 16. ⭐⭐ Well, in fact, the first manifest I've found was already able to run exporter on master nodes. However, I guess that the key to the task is the `nodeSelector` parameter.
 
-## 2022-03-30 Homework-1
+## 2022-03-30 Homework 1: Prepare
 
 1. Why the pods were restarted after `docker rm -f` and `kubectl delete pod`? What is different about how the pods `core-dns` and `kube-apiserver` are restarted?
    - The pod `core-dns` was restored because it was previously deployed as a *Deployment* resource. So, the *scheduler* tracks that there are enough replicas of the corresponding service is *Running*.
