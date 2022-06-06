@@ -1,0 +1,45 @@
+repositories:
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+  - name: pebble
+    url: https://jupyterhub.github.io/helm-chart/
+  - name: jetstack
+    url: https://charts.jetstack.io
+  - name: chartmuseum
+    url: https://chartmuseum.github.io/charts
+  - name: harbor
+    url: https://helm.goharbor.io
+
+releases:
+  - chart: ingress-nginx/ingress-nginx
+    name: ingress-nginx
+    namespace: ingress-nginx
+    createNamespace: true
+    values:
+      - ../nginx-ingress/values.yaml
+  - chart: pebble/pebble
+    name: pebble
+    namespace: pebble
+    createNamespace: true
+    values:
+      - ../pebble/values.yaml
+  - chart: jetstack/cert-manager
+    name: cert-manager
+    namespace: cert-manager
+    version: v1.8.0
+    createNamespace: true
+    values:
+      - ../cert-manager/values.yaml
+      # Still have to apply some manifests manually!
+  - chart: chartmuseum/chartmuseum
+    name: chartmuseum
+    namespace: chartmuseum
+    createNamespace: true
+    values:
+      - ../chartmuseum/values.yaml
+  - chart: harbor/harbor
+    name: harbor
+    namespace: harbor
+    createNamespace: true
+    values:
+      - ../harbor/values.yaml

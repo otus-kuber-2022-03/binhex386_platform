@@ -1,0 +1,13 @@
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts
+  value:
+    - mountPath: /etc/ssl/certs/internal-ca.pem
+      subPath: internal-ca.pem
+      name: pebble-ca
+      readOnly: true
+- op: add
+  path: /spec/template/spec/volumes
+  value:
+    - name: pebble-ca
+      configMap:
+        name: pebble-ca

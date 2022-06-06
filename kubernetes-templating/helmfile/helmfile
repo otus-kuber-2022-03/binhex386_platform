@@ -1,0 +1,9 @@
+#!/bin/sh
+docker run -ti --rm --net=host \
+    -v "${HOME}:${HOME}:ro" \
+    -v "${HOME}/.kube:/root/.kube:ro" \
+    -v "${HOME}/.config/helm:/root/.config/helm:rw" \
+    -v "${PWD}:/wd:ro" \
+    --workdir /wd \
+    quay.io/roboll/helmfile:helm3-v0.135.0 \
+    helmfile "$@"

@@ -1,0 +1,4 @@
+controller:
+  service:
+    externalIPs:
+      - 192.168.59.101

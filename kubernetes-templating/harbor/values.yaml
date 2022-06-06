@@ -1,0 +1,17 @@
+notary:
+  enabled: false
+
+expose:
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: pebble
+      acme.cert-manager.io/http01-edit-in-place: "true"
+    hosts:
+      core: harbor.example.test
+  tls:
+    secret:
+      secretName: harbor.example.test
+
+externalURL: https://harbor.example.test/
