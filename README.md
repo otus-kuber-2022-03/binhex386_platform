@@ -4,6 +4,223 @@ binhex386 Platform repository
 
 # CHANGELOG
 
+## 2022-06-05 Homework 6: Templates
+
+As GCP is unavailable and YC we're out of promocodes, the homework will be done within a local cluster using an internal ACME service.
+
+Create a new minikube cluster:
+
+```shell
+minikube delete
+minikube start --driver=virtualbox
+```
+
+[Install](https://helm.sh/docs/intro/install/) Helm.
+
+[Install](https://kubernetes.github.io/ingress-nginx/deploy/) Nginx ingress controller:
+
+```shell
+kubectl create ns ingress-nginx
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace \
+  -f ./kubernetes-templating/nginx-ingress/values.yaml
+```
+
+[Install](https://cert-manager.io/docs/installation/helm/#prerequisites) cert-manager:
+
+```shell
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
+helm install \
+   cert-manager jetstack/cert-manager \
+   --namespace cert-manager \
+   --create-namespace \
+   --version v1.8.0 \
+```
+
+[Install](https://github.com/jupyterhub/pebble-helm-chart#installation) pebble (an ACME server like Let's Encrypt):
+
+```shell
+helm repo add pebble https://jupyterhub.github.io/helm-chart/
+helm repo update
+kubectl create ns pebble
+helm install pebble --namespace=pebble
+```
+
+Note about ACME server:
+
+```text
+The ACME server is available at:
+
+    https://pebble.pebble/dir
+    https://localhost:32443/dir
+
+The ACME server generates leaf certificates to ACME clients,
+and signs them with an insecure root cert, available at:
+
+    https://pebble.pebble:8444/roots/0
+    https://localhost:32444/roots/0
+
+Communication with the ACME server itself requires
+accepting a root certificate in configmap/pebble:
+
+    kubectl get configmap/pebble -o jsonpath="{.data['root-cert\.pem']}"
+
+A DNS server is running to help you map domain names to
+services in the Kubernetes cluster, and is available at:
+
+    pebble-coredns.pebble:53
+    localhost:32053
+```
+
+Make cert-manager trust pebble CA when communicating via RESTful API:
+
+```shell
+kubectl apply -f ./kubernetes-templating/cert-manager/internal-ca.yaml
+kubectl patch deployment cert-manager -n cert-manager --type json --patch-file ./kubernetes-templating/cert-manager/cert-manager-patch.yaml
+```
+
+Apply the [cluster-issuer.yaml](./kubernetes-templating/cert-manager/cluster-issuer.yaml) manifest.
+
+```shell
+kubectl apply -f ./kubernetes-templating/cert-manager/cluster-issuer.yaml
+```
+
+Update Pebble's coredns config to resolve `*.test` to our ingress:
+
+```shell
+helm upgrade pebble pebble/pebble --namespace=pebble -f ./kubernetes-templating/pebble/values.yaml
+```
+
+Install Chartmuseum:
+
+```
+kubectl create ns chartmuseum
+helm repo add chartmuseum https://chartmuseum.github.io/charts
+helm repo update
+helm install chartmuseum chartmuseum/chartmuseum -f ./kubernetes-templating/chartmuseum/values.yaml -n chartmuseum
+```
+
+⭐ Extra task with the use of Chartmuseum is skipped. Internal CA is implemented instead.
+
+[Install](https://github.com/goharbor/harbor-helm#installation) Harbor.
+
+```shell
+kubectl create ns harbor
+helm repo add harbor https://helm.goharbor.io
+helm repo update
+helm upgrade --install harbor harbor/harbor -f ./kubernetes-templating/harbor/values.yaml -n harbor
+```
+
+Harbor dashboard is now accessible at https://harbor.example.test/ under `admin:Harbor12345`.
+
+Sync deployment using Helmfile:
+
+```shell
+cd ./kubernetes-templating
+./helmfile/helmfile -f ./helmfile/helmfile.yaml sync
+```
+
+The result:
+
+```
+UPDATED RELEASES:
+NAME            CHART                         VERSION
+pebble          pebble/pebble                   1.0.0
+chartmuseum     chartmuseum/chartmuseum         3.8.0
+cert-manager    jetstack/cert-manager          v1.8.0
+harbor          harbor/harbor                   1.9.1
+ingress-nginx   ingress-nginx/ingress-nginx     4.1.4
+```
+
+Create a hipster-shop chart:
+
+```
+helm create kubernetes-templating/hipster-shop
+cd kubernetes-templating/hipster-shop
+rm values.yaml
+rm -r templates/*
+cd templates
+curl -OL https://github.com/express42/otus-platform-snippets/raw/master/Module-04/05-Templating/manifests/all-hipster-shop.yaml
+kubectl create ns hipster-shop
+cd ../../..
+helm upgrade --install hipster-shop kubernetes-templating/hipster-shop --namespace hipster-shop
+kubectl port-forward services/frontend 8000:80
+```
+
+Verify it is working. Now, create a separate chart for the frontend service:
+
+```
+helm create kubernetes-templating/frontend
+# Edit manifests
+helm upgrade --install hipster-shop kubernetes-templating/hipster-shop --namespace hipster-shop
+helm upgrade --install frontend kubernetes-templating/frontend --namespace hipster-shop
+```
+
+Make use of `values.yaml` and check that everything works.
+
+```
+helm delete frontend -n hipster-shop
+```
+
+Add dependencies to `hipster-shop/Chart.yaml` and update `hipster-shop` chart:
+
+```
+helm dep update kubernetes-templating/hipster-shop
+helm upgrade --install hipster-shop kubernetes-templating/hipster-shop --namespace hipster-shop
+helm upgrade --install hipster-shop kubernetes-templating/hipster-shop --namespace hipster-shop --set frontend.service.NodePort=31234
+```
+
+⭐ Optional task with requirements skipped.
+⭐ Optional tasl with helm secrets skipped.
+
+Create `repo.sh` and try to add our own repository:
+
+```
+Error: looks like "https://harbor.example.test/" is not a valid chart repository or cannot be reached: Get "https://harbor.example.test/index.yaml": x509: certificate signed by unknown authority
+```
+
+We have out own CA, but `helm` do not have an option to skip verifying a certificate or specifying out own CA bundle. But I got the idea.
+
+Extract `paymentservice` and `shippingservice` to `kubecfg` directory. Upgrade `hipsher-shop` release and verify that it became broken. Make a jsonnet-file. Verify it's OK with `kubecfg show services.jsonnet`. Create deployments and services:
+
+```
+kubecfg update services.jsonnet --namespace hipster-shop
+```
+
+Verify services and deployments were created:
+
+```
+kubectl get services -n hipster-shop
+kubectl get deployments -n hipster-shop
+```
+
+⭐ Optional task with other jsonnet-based templating tools skipped.
+
+Create kustomizations for `cartservice` in `kubernetes-templating/kustomize`. Verify the manifests:
+
+```
+kubectl kustomize overlays/dev
+kubectl kustomize overlays/prod
+```
+
+Deploy service using kustomize in two environments:
+
+```
+kubectl apply -n hipster-shop -k kubernetes-templating/kustomize/overlays/dev/
+kubectl create ns hipster-shop-prod
+kubectl apply -n hipster-shop-prod -k kubernetes-templating/kustomize/overlays/prod/
+```
+
+Verify it works:
+
+```
+kubectl get services -n hipster-shop-prod
+kubectl describe service/prod-cartservice -n hipster-shop-prod
+```
+
 ## 2022-05-10 Homework 5: Volumes
 
 1. Created a new `kind` cluster.

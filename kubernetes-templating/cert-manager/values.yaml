@@ -1,0 +1,2 @@
+extraArgs:
+  - --acme-http01-solver-nameservers=pebble-coredns.pebble:53

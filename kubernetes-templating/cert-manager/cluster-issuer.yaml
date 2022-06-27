@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: pebble
+spec:
+  acme:
+    email: admin@pebble.pebble
+    server: https://pebble.pebble/dir
+    privateKeySecretRef:
+      name: pebble-key
+    solvers:
+    - http01:
+        ingress:
+          class: public

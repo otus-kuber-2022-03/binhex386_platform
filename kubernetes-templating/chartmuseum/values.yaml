@@ -1,0 +1,12 @@
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: pebble
+    acme.cert-manager.io/http01-edit-in-place: "true"
+  hosts:
+    - name: charts.example.test
+      path: /
+      tls: true
+      tlsSecret: charts.example.test
